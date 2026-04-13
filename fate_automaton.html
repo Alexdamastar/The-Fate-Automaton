@@ -778,6 +778,241 @@ const APP_DATA = {
           }
         ]
       }
+    },
+    "road-rage-spiral": {
+      "title": "The Road-Rage Spiral",
+      "description": "A small traffic conflict can escalate through pride and impulsive choices into irreversible outcomes.",
+      "nfa": {
+        "states": [
+          "Alive",
+          "TrafficDelay",
+          "Provoked",
+          "ChaseImpulse",
+          "AggressiveManeuver",
+          "NearMiss",
+          "PoliceStop",
+          "Recovery",
+          "FinalChoice",
+          "DEATH"
+        ],
+        "start": "Alive",
+        "accepting": [
+          "DEATH"
+        ],
+        "transitions": [
+          {
+            "from": "Alive",
+            "label": "Drive during rush hour",
+            "to": "TrafficDelay"
+          },
+          {
+            "from": "Alive",
+            "label": "Stay calm",
+            "to": "Alive"
+          },
+          {
+            "from": "TrafficDelay",
+            "label": "Get cut off",
+            "to": "Provoked"
+          },
+          {
+            "from": "TrafficDelay",
+            "label": "Let it go",
+            "to": "Alive"
+          },
+          {
+            "from": "Provoked",
+            "label": "Tailgate",
+            "to": "ChaseImpulse"
+          },
+          {
+            "from": "Provoked",
+            "label": "Breathe and reset",
+            "to": "Recovery"
+          },
+          {
+            "from": "Provoked",
+            "label": "\u03b5",
+            "to": "ChaseImpulse"
+          },
+          {
+            "from": "ChaseImpulse",
+            "label": "Weave through lanes",
+            "to": "AggressiveManeuver"
+          },
+          {
+            "from": "ChaseImpulse",
+            "label": "Back off",
+            "to": "NearMiss"
+          },
+          {
+            "from": "AggressiveManeuver",
+            "label": "Run red light",
+            "to": "FinalChoice"
+          },
+          {
+            "from": "AggressiveManeuver",
+            "label": "Get pulled over",
+            "to": "PoliceStop"
+          },
+          {
+            "from": "NearMiss",
+            "label": "Learn from scare",
+            "to": "Recovery"
+          },
+          {
+            "from": "NearMiss",
+            "label": "Escalate again",
+            "to": "Provoked"
+          },
+          {
+            "from": "PoliceStop",
+            "label": "Cooperate",
+            "to": "Recovery"
+          },
+          {
+            "from": "PoliceStop",
+            "label": "Drive off in panic",
+            "to": "FinalChoice"
+          },
+          {
+            "from": "Recovery",
+            "label": "Change habits",
+            "to": "Alive"
+          },
+          {
+            "from": "Recovery",
+            "label": "Hold a grudge",
+            "to": "Provoked"
+          },
+          {
+            "from": "FinalChoice",
+            "label": "Accept the risk",
+            "to": "DEATH"
+          },
+          {
+            "from": "FinalChoice",
+            "label": "\u03b5",
+            "to": "DEATH"
+          }
+        ]
+      },
+      "dfa": {
+        "states": [
+          "Alive",
+          "TrafficDelay",
+          "{ChaseImpulse, Provoked}",
+          "NearMiss",
+          "Recovery",
+          "ChaseImpulse",
+          "AggressiveManeuver",
+          "PoliceStop",
+          "{DEATH, FinalChoice}",
+          "DEATH"
+        ],
+        "start": "Alive",
+        "accepting": [
+          "DEATH",
+          "{DEATH, FinalChoice}"
+        ],
+        "transitions": [
+          {
+            "from": "Alive",
+            "label": "Drive during rush hour",
+            "to": "TrafficDelay"
+          },
+          {
+            "from": "Alive",
+            "label": "Stay calm",
+            "to": "Alive"
+          },
+          {
+            "from": "TrafficDelay",
+            "label": "Get cut off",
+            "to": "{ChaseImpulse, Provoked}"
+          },
+          {
+            "from": "TrafficDelay",
+            "label": "Let it go",
+            "to": "Alive"
+          },
+          {
+            "from": "{ChaseImpulse, Provoked}",
+            "label": "Back off",
+            "to": "NearMiss"
+          },
+          {
+            "from": "{ChaseImpulse, Provoked}",
+            "label": "Breathe and reset",
+            "to": "Recovery"
+          },
+          {
+            "from": "{ChaseImpulse, Provoked}",
+            "label": "Tailgate",
+            "to": "ChaseImpulse"
+          },
+          {
+            "from": "{ChaseImpulse, Provoked}",
+            "label": "Weave through lanes",
+            "to": "AggressiveManeuver"
+          },
+          {
+            "from": "NearMiss",
+            "label": "Escalate again",
+            "to": "{ChaseImpulse, Provoked}"
+          },
+          {
+            "from": "NearMiss",
+            "label": "Learn from scare",
+            "to": "Recovery"
+          },
+          {
+            "from": "Recovery",
+            "label": "Change habits",
+            "to": "Alive"
+          },
+          {
+            "from": "Recovery",
+            "label": "Hold a grudge",
+            "to": "{ChaseImpulse, Provoked}"
+          },
+          {
+            "from": "ChaseImpulse",
+            "label": "Back off",
+            "to": "NearMiss"
+          },
+          {
+            "from": "ChaseImpulse",
+            "label": "Weave through lanes",
+            "to": "AggressiveManeuver"
+          },
+          {
+            "from": "AggressiveManeuver",
+            "label": "Get pulled over",
+            "to": "PoliceStop"
+          },
+          {
+            "from": "AggressiveManeuver",
+            "label": "Run red light",
+            "to": "{DEATH, FinalChoice}"
+          },
+          {
+            "from": "PoliceStop",
+            "label": "Cooperate",
+            "to": "Recovery"
+          },
+          {
+            "from": "PoliceStop",
+            "label": "Drive off in panic",
+            "to": "{DEATH, FinalChoice}"
+          },
+          {
+            "from": "{DEATH, FinalChoice}",
+            "label": "Accept the risk",
+            "to": "DEATH"
+          }
+        ]
+      }
     }
   }
 };
