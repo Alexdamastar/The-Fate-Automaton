@@ -128,8 +128,11 @@ function makeNetwork(containerId, data, type) {
   });
   net.on('click', params => {
     if (params.nodes && params.nodes.length > 0) {
-      showStateInfo(type, params.nodes[0]);
+      const domPointer = params.pointer && params.pointer.DOM ? params.pointer.DOM : null;
+      showStateTooltip(type, params.nodes[0], containerId, domPointer);
+      return;
     }
+    hideStateTooltip();
   });
   return net;
 }
@@ -166,18 +169,19 @@ function scheduleFit(network, containerId) {
   requestAnimationFrame(tryFit);
 }
 
-function hideStateInfo() {
-  const box = document.getElementById('state-info');
+function hideStateTooltip() {
+  const box = document.getElementById('state-tooltip');
   if (!box) return;
   box.classList.remove('active');
 }
 
-function showStateInfo(machineType, stateId) {
-  const box = document.getElementById('state-info');
-  const title = document.getElementById('state-info-title');
-  const text = document.getElementById('state-info-text');
-  const chip = document.getElementById('state-info-chip');
-  if (!box || !title || !text || !chip) return;
+function showStateTooltip(machineType, stateId, containerId, domPointer) {
+  const box = document.getElementById('state-tooltip');
+  const title = document.getElementById('state-tooltip-title');
+  const text = document.getElementById('state-tooltip-text');
+  const chip = document.getElementById('state-tooltip-chip');
+  const container = document.getElementById(containerId);
+  if (!box || !title || !text || !chip || !container || !domPointer) return;
 
   const scenario = getScenario();
   const details = scenario[machineType]?.stateDetails || {};
@@ -188,6 +192,25 @@ function showStateInfo(machineType, stateId) {
   chip.textContent = `${scenario.title} - ${modeLabel}`;
   text.textContent = body;
   box.classList.add('active');
+
+  const rect = container.getBoundingClientRect();
+  const anchorX = rect.left + domPointer.x;
+  const anchorY = rect.top + domPointer.y;
+  const padding = 12;
+  const gap = 14;
+  const tooltipWidth = box.offsetWidth || 320;
+  const tooltipHeight = box.offsetHeight || 150;
+
+  let left = anchorX - tooltipWidth / 2;
+  left = Math.max(padding, Math.min(left, window.innerWidth - tooltipWidth - padding));
+
+  let top = anchorY - tooltipHeight - gap;
+  if (top < padding) {
+    top = Math.min(window.innerHeight - tooltipHeight - padding, anchorY + gap);
+  }
+
+  box.style.left = `${left}px`;
+  box.style.top = `${top}px`;
 }
 
 function resetNetworks() {
@@ -228,7 +251,7 @@ function fitByKey(key) {
 }
 
 function refreshActiveView() {
-  hideStateInfo();
+  hideStateTooltip();
   if (activeView === 'both') {
     ensureNetwork('nfa2');
     ensureNetwork('dfa2');
@@ -258,7 +281,7 @@ function hydrateScenarioPicker() {
   selector.addEventListener('change', event => {
     activeScenarioKey = event.target.value;
     note.textContent = getScenario().description;
-    hideStateInfo();
+    hideStateTooltip();
     resetNetworks();
     refreshActiveView();
   });

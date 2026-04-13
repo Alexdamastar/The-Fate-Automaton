@@ -39,14 +39,6 @@
     <div class="controls">
       <button class="btn" onclick="fitByKey('nfa')">Fit View</button>
     </div>
-    <div class="state-info" id="state-info">
-      <div class="state-info-head">
-        <h4 id="state-info-title">State Details</h4>
-        <button class="state-info-close" onclick="hideStateInfo()">Close</button>
-      </div>
-      <span id="state-info-chip" class="state-chip"></span>
-      <p id="state-info-text"></p>
-    </div>
     <div class="graph-wrap" id="graph-nfa"></div>
     <div class="explain">
       <h3>What is the NFA?</h3>
@@ -105,4 +97,12 @@
   </div>
 </main>
 
-<script>__SCRIPT__</script>`r`n</body>`r`n</html>
+<div id="state-tooltip" class="state-tooltip" role="status" aria-live="polite">
+  <h4 id="state-tooltip-title">State Details</h4>
+  <span id="state-tooltip-chip" class="state-chip"></span>
+  <p id="state-tooltip-text"></p>
+</div>
+
+<script>__SCRIPT__</script>
+</body>
+</html>

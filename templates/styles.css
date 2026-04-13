@@ -196,42 +196,33 @@
     margin: 0 .15rem;
   }
 
-  .state-info {
-    display: none;
+  .state-tooltip {
+    position: fixed;
+    z-index: 1200;
+    max-width: 340px;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: .9rem 1rem;
-    margin-top: .2rem;
+    padding: .85rem .95rem;
+    box-shadow: 0 16px 28px rgba(0, 0, 0, .55);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
   }
-  .state-info.active { display: block; }
-  .state-info-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: .8rem;
+  .state-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
-  .state-info h4 {
+  .state-tooltip h4 {
     font-family: 'Playfair Display', serif;
     color: var(--gold2);
     font-size: 1rem;
     line-height: 1.2;
   }
-  .state-info-close {
-    background: #1c1710;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    cursor: pointer;
-    padding: .2rem .5rem;
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-  }
-  .state-info-close:hover {
-    color: var(--gold2);
-    border-color: var(--gold);
-  }
-  .state-info p {
+  .state-tooltip p {
     margin-top: .55rem;
     font-size: .93rem;
     line-height: 1.55;

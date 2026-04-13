@@ -204,42 +204,33 @@
     margin: 0 .15rem;
   }
 
-  .state-info {
-    display: none;
+  .state-tooltip {
+    position: fixed;
+    z-index: 1200;
+    max-width: 340px;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: .9rem 1rem;
-    margin-top: .2rem;
+    padding: .85rem .95rem;
+    box-shadow: 0 16px 28px rgba(0, 0, 0, .55);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
   }
-  .state-info.active { display: block; }
-  .state-info-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: .8rem;
+  .state-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
-  .state-info h4 {
+  .state-tooltip h4 {
     font-family: 'Playfair Display', serif;
     color: var(--gold2);
     font-size: 1rem;
     line-height: 1.2;
   }
-  .state-info-close {
-    background: #1c1710;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    cursor: pointer;
-    padding: .2rem .5rem;
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-  }
-  .state-info-close:hover {
-    color: var(--gold2);
-    border-color: var(--gold);
-  }
-  .state-info p {
+  .state-tooltip p {
     margin-top: .55rem;
     font-size: .93rem;
     line-height: 1.55;
@@ -327,14 +318,6 @@
     <div class="controls">
       <button class="btn" onclick="fitByKey('nfa')">Fit View</button>
     </div>
-    <div class="state-info" id="state-info">
-      <div class="state-info-head">
-        <h4 id="state-info-title">State Details</h4>
-        <button class="state-info-close" onclick="hideStateInfo()">Close</button>
-      </div>
-      <span id="state-info-chip" class="state-chip"></span>
-      <p id="state-info-text"></p>
-    </div>
     <div class="graph-wrap" id="graph-nfa"></div>
     <div class="explain">
       <h3>What is the NFA?</h3>
@@ -392,6 +375,12 @@
     </div>
   </div>
 </main>
+
+<div id="state-tooltip" class="state-tooltip" role="status" aria-live="polite">
+  <h4 id="state-tooltip-title">State Details</h4>
+  <span id="state-tooltip-chip" class="state-chip"></span>
+  <p id="state-tooltip-text"></p>
+</div>
 
 <script>﻿const APP_DATA = {
   "defaultScenario": "fateful-baseball",
@@ -908,11 +897,11 @@
           "TrafficDelay": "Frustration trigger. Delay itself is harmless but primes emotional escalation.",
           "Provoked": "Emotional ignition state. Ego and anger make impulsive branches more likely.",
           "ChaseImpulse": "Retaliatory mindset. You are now prioritizing reaction over safety.",
-          "AggressiveManeuver": "Dangerous tactical driving. Error tolerance is minimal.",
-          "NearMiss": "Immediate scare state. You can learn and recover or re-enter escalation.",
-          "PoliceStop": "External intervention. Compliance can de-escalate; panic can worsen outcomes.",
+          "AggressiveManeuver": "At this point you are flying through traffic to catch up or force control. Tiny timing errors can end very badly.",
+          "NearMiss": "A direct warning event. You can reset your behavior now or reinterpret the scare and re-enter escalation.",
+          "PoliceStop": "External intervention point. Calm compliance can de-escalate, while panic can push the system toward irreversible harm.",
           "Recovery": "Decompression branch. Behavior can reset to safe driving or relapse to provocation.",
-          "FinalChoice": "Critical threshold where one more risk decision can become fatal.",
+          "FinalChoice": "You could not let it go, and now the trajectory is sealed. Whether triggered by running the light or fleeing in panic, this branch represents irreversible fatal exposure.",
           "DEATH": "Accepting fatal state for the road-rage language."
         },
         "transitions": [
@@ -1035,12 +1024,12 @@
           "Alive": "Single DFA state. Neutral baseline driving state with no active conflict.",
           "TrafficDelay": "Single DFA state. Frustration trigger. Delay itself is harmless but primes emotional escalation.",
           "{ChaseImpulse, Provoked}": "Merged DFA subset state. The machine is tracking these NFA possibilities at once: ChaseImpulse: Retaliatory mindset. You are now prioritizing reaction over safety. | Provoked: Emotional ignition state. Ego and anger make impulsive branches more likely.",
-          "NearMiss": "Single DFA state. Immediate scare state. You can learn and recover or re-enter escalation.",
+          "NearMiss": "Single DFA state. A direct warning event. You can reset your behavior now or reinterpret the scare and re-enter escalation.",
           "Recovery": "Single DFA state. Decompression branch. Behavior can reset to safe driving or relapse to provocation.",
           "ChaseImpulse": "Single DFA state. Retaliatory mindset. You are now prioritizing reaction over safety.",
-          "AggressiveManeuver": "Single DFA state. Dangerous tactical driving. Error tolerance is minimal.",
-          "PoliceStop": "Single DFA state. External intervention. Compliance can de-escalate; panic can worsen outcomes.",
-          "{DEATH, FinalChoice}": "Merged DFA subset state. The machine is tracking these NFA possibilities at once: DEATH: Accepting fatal state for the road-rage language. | FinalChoice: Critical threshold where one more risk decision can become fatal.",
+          "AggressiveManeuver": "Single DFA state. At this point you are flying through traffic to catch up or force control. Tiny timing errors can end very badly.",
+          "PoliceStop": "Single DFA state. External intervention point. Calm compliance can de-escalate, while panic can push the system toward irreversible harm.",
+          "{DEATH, FinalChoice}": "Merged DFA subset state. The machine is tracking these NFA possibilities at once: DEATH: Accepting fatal state for the road-rage language. | FinalChoice: You could not let it go, and now the trajectory is sealed. Whether triggered by running the light or fleeing in panic, this branch represents irreversible fatal exposure.",
           "DEATH": "Single DFA state. Accepting fatal state for the road-rage language."
         },
         "transitions": [
@@ -1273,8 +1262,11 @@ function makeNetwork(containerId, data, type) {
   });
   net.on('click', params => {
     if (params.nodes && params.nodes.length > 0) {
-      showStateInfo(type, params.nodes[0]);
+      const domPointer = params.pointer && params.pointer.DOM ? params.pointer.DOM : null;
+      showStateTooltip(type, params.nodes[0], containerId, domPointer);
+      return;
     }
+    hideStateTooltip();
   });
   return net;
 }
@@ -1311,18 +1303,19 @@ function scheduleFit(network, containerId) {
   requestAnimationFrame(tryFit);
 }
 
-function hideStateInfo() {
-  const box = document.getElementById('state-info');
+function hideStateTooltip() {
+  const box = document.getElementById('state-tooltip');
   if (!box) return;
   box.classList.remove('active');
 }
 
-function showStateInfo(machineType, stateId) {
-  const box = document.getElementById('state-info');
-  const title = document.getElementById('state-info-title');
-  const text = document.getElementById('state-info-text');
-  const chip = document.getElementById('state-info-chip');
-  if (!box || !title || !text || !chip) return;
+function showStateTooltip(machineType, stateId, containerId, domPointer) {
+  const box = document.getElementById('state-tooltip');
+  const title = document.getElementById('state-tooltip-title');
+  const text = document.getElementById('state-tooltip-text');
+  const chip = document.getElementById('state-tooltip-chip');
+  const container = document.getElementById(containerId);
+  if (!box || !title || !text || !chip || !container || !domPointer) return;
 
   const scenario = getScenario();
   const details = scenario[machineType]?.stateDetails || {};
@@ -1333,6 +1326,25 @@ function showStateInfo(machineType, stateId) {
   chip.textContent = `${scenario.title} - ${modeLabel}`;
   text.textContent = body;
   box.classList.add('active');
+
+  const rect = container.getBoundingClientRect();
+  const anchorX = rect.left + domPointer.x;
+  const anchorY = rect.top + domPointer.y;
+  const padding = 12;
+  const gap = 14;
+  const tooltipWidth = box.offsetWidth || 320;
+  const tooltipHeight = box.offsetHeight || 150;
+
+  let left = anchorX - tooltipWidth / 2;
+  left = Math.max(padding, Math.min(left, window.innerWidth - tooltipWidth - padding));
+
+  let top = anchorY - tooltipHeight - gap;
+  if (top < padding) {
+    top = Math.min(window.innerHeight - tooltipHeight - padding, anchorY + gap);
+  }
+
+  box.style.left = `${left}px`;
+  box.style.top = `${top}px`;
 }
 
 function resetNetworks() {
@@ -1373,7 +1385,7 @@ function fitByKey(key) {
 }
 
 function refreshActiveView() {
-  hideStateInfo();
+  hideStateTooltip();
   if (activeView === 'both') {
     ensureNetwork('nfa2');
     ensureNetwork('dfa2');
@@ -1403,7 +1415,7 @@ function hydrateScenarioPicker() {
   selector.addEventListener('change', event => {
     activeScenarioKey = event.target.value;
     note.textContent = getScenario().description;
-    hideStateInfo();
+    hideStateTooltip();
     resetNetworks();
     refreshActiveView();
   });
@@ -1421,4 +1433,6 @@ function showView(name, btn) {
 
 hydrateScenarioPicker();
 refreshActiveView();
-</script>`r`n</body>`r`n</html>
+</script>
+</body>
+</html>
