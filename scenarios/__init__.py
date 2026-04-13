@@ -1,0 +1,3 @@
+from .data import DEFAULT_SCENARIO_KEY, SCENARIOS
+
+__all__ = ["SCENARIOS", "DEFAULT_SCENARIO_KEY"]
