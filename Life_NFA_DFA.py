@@ -7,7 +7,6 @@ from templates.renderer import build_html
 
 # ─────────────────────────────────────────────
 #  ENTRY POINT
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def main():
     payload = build_payload(SCENARIOS, DEFAULT_SCENARIO_KEY)
